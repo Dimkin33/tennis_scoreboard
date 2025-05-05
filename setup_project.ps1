@@ -1,8 +1,8 @@
 # setup_empty_project.ps1
-# Скрипт для создания структуры проекта tennis_scoreboard, повторяющей zhukovsd/tennis-scoreboard-html-layouts
-# Без Flask, только frontend файлы и Python-модули
+# Скрипт для создания структуры проекта tennis_scoreboard
+# Фронтенд (HTML, css/, js/, images/) в templates/, без Flask
 
-Write-Host "Setting up tennis_scoreboard project structure matching zhukovsd frontend..."
+Write-Host "Setting up tennis_scoreboard project structure with frontend in templates/..."
 
 # Проверка текущей директории
 $projectDir = Get-Location
@@ -35,9 +35,9 @@ $dirs = @(
     "src/tennis_scoreboard/models",
     "src/tennis_scoreboard/services",
     "src/tennis_scoreboard/controllers",
-    "src/tennis_scoreboard/css",
-    "src/tennis_scoreboard/js",
-    "src/tennis_scoreboard/images",
+    "src/tennis_scoreboard/templates/css",
+    "src/tennis_scoreboard/templates/js",
+    "src/tennis_scoreboard/templates/images",
     "src/tennis_scoreboard/tests",
     "src/tennis_scoreboard/migrations"
 )
@@ -50,7 +50,7 @@ foreach ($dir in $dirs) {
 $pythonFiles = @(
     "src/tennis_scoreboard/__init__.py",
     "src/tennis_scoreboard/models/__init__.py",
-    "src/tennis_scoreboard  /models/player.py",
+    "src/tennis_scoreboard/models/player.py",
     "src/tennis_scoreboard/models/match.py",
     "src/tennis_scoreboard/services/__init__.py",
     "src/tennis_scoreboard/services/match_service.py",
@@ -66,34 +66,34 @@ foreach ($file in $pythonFiles) {
     Write-Host "Created $file"
 }
 
-# Скачивание и копирование файлов из zhukovsd
+# Скачивание и копирование файлов из zhukovsd в templates/
 Write-Host "Downloading zhukovsd/tennis-scoreboard-html-layouts..."
 $tempDir = Join-Path $projectDir "temp_layouts"
 git clone https://github.com/zhukovsd/tennis-scoreboard-html-layouts $tempDir
 if (Test-Path $tempDir) {
-    Copy-Item -Recurse "$tempDir/css/*" "src/tennis_scoreboard/css/" -Force
-    Copy-Item -Recurse "$tempDir/js/*" "src/tennis_scoreboard/js/" -Force
-    Copy-Item -Recurse "$tempDir/images/*" "src/tennis_scoreboard/images/" -Force
-    Copy-Item "$tempDir/index.html" "src/tennis_scoreboard/index.html" -Force
-    Copy-Item "$tempDir/new-match.html" "src/tennis_scoreboard/new-match.html" -Force
-    Copy-Item "$tempDir/match-score.html" "src/tennis_scoreboard/match-score.html" -Force
-    Copy-Item "$tempDir/matches.html" "src/tennis_scoreboard/matches.html" -Force
+    Copy-Item -Recurse "$tempDir/css/*" "src/tennis_scoreboard/templates/css/" -Force
+    Copy-Item -Recurse "$tempDir/js/*" "src/tennis_scoreboard/templates/js/" -Force
+    Copy-Item -Recurse "$tempDir/images/*" "src/tennis_scoreboard/templates/images/" -Force
+    Copy-Item "$tempDir/index.html" "src/tennis_scoreboard/templates/index.html" -Force
+    Copy-Item "$tempDir/new-match.html" "src/tennis_scoreboard/templates/new-match.html" -Force
+    Copy-Item "$tempDir/match-score.html" "src/tennis_scoreboard/templates/match-score.html" -Force
+    Copy-Item "$tempDir/matches.html" "src/tennis_scoreboard/templates/matches.html" -Force
     Remove-Item -Recurse -Force $tempDir
-    Write-Host "Integrated files from zhukovsd/tennis-scoreboard-html-layouts into src/tennis_scoreboard/"
+    Write-Host "Integrated frontend files from zhukovsd/tennis-scoreboard-html-layouts into src/tennis_scoreboard/templates/"
 } else {
     Write-Host "Failed to clone layouts repository. Downloading ZIP as fallback..."
     Invoke-WebRequest -Uri https://github.com/zhukovsd/tennis-scoreboard-html-layouts/archive/refs/heads/main.zip -OutFile temp_layouts.zip
     Expand-Archive temp_layouts.zip -DestinationPath $tempDir
-    Copy-Item -Recurse "$tempDir/tennis-scoreboard-html-layouts-main/css/*" "src/tennis_scoreboard/css/" -Force
-    Copy-Item -Recurse "$tempDir/tennis-scoreboard-html-layouts-main/js/*" "src/tennis_scoreboard/js/" -Force
-    Copy-Item -Recurse "$tempDir/tennis-scoreboard-html-layouts-main/images/*" "src/tennis_scoreboard/images/" -Force
-    Copy-Item "$tempDir/tennis-scoreboard-html-layouts-main/index.html" "src/tennis_scoreboard/index.html" -Force
-    Copy-Item "$tempDir/tennis-scoreboard-html-layouts-main/new-match.html" "src/tennis_scoreboard/new-match.html" -Force
-    Copy-Item "$tempDir/tennis-scoreboard-html-layouts-main/match-score.html" "src/tennis_scoreboard/match-score.html" -Force
-    Copy-Item "$tempDir/tennis_scoreboard-html-layouts-main/matches.html" "src/tennis_scoreboard/matches.html" -Force
+    Copy-Item -Recurse "$tempDir/tennis-scoreboard-html-layouts-main/css/*" "src/tennis_scoreboard/templates/css/" -Force
+    Copy-Item -Recurse "$tempDir/tennis-scoreboard-html-layouts-main/js/*" "src/tennis_scoreboard/templates/js/" -Force
+    Copy-Item -Recurse "$tempDir/tennis_scoreboard-html-layouts-main/images/*" "src/tennis_scoreboard/templates/images/" -Force
+    Copy-Item "$tempDir/tennis-scoreboard-html-layouts-main/index.html" "src/tennis_scoreboard/templates/index.html" -Force
+    Copy-Item "$tempDir/tennis-scoreboard-html-layouts-main/new-match.html" "src/tennis_scoreboard/templates/new-match.html" -Force
+    Copy-Item "$tempDir/tennis_scoreboard-html-layouts-main/match-score.html" "src/tennis_scoreboard/templates/match-score.html" -Force
+    Copy-Item "$tempDir/tennis_scoreboard-html-layouts-main/matches.html" "src/tennis_scoreboard/templates/matches.html" -Force
     Remove-Item -Recurse -Force $tempDir
     Remove-Item -Force temp_layouts.zip
-    Write-Host "Integrated files from ZIP"
+    Write-Host "Integrated frontend files from ZIP"
 }
 
 # Обновление .gitignore
@@ -121,10 +121,9 @@ rye run ruff check src/tennis_scoreboard
 # Git: добавление и коммит
 Write-Host "Committing changes to Git..."
 git add .
-git commit -m "Setup project structure matching zhukovsd frontend without Flask" -m "Generated by setup_empty_project.ps1"
+git commit -m "Setup project structure with frontend in templates/ without Flask" -m "Generated by setup_empty_project.ps1"
 git push
 
-Write-Host "Project setup complete! Structure matches zhukovsd/tennis-scoreboard-html-layouts."
-Write-Host "HTML, css/, js/, images/ in src/tennis_scoreboard/."
+Write-Host "Project setup complete! Frontend files in src/tennis_scoreboard/templates/."
 Write-Host "Python modules in models/, services/, controllers/, tests/."
 Write-Host "Next steps: Implement backend logic in Python modules."
