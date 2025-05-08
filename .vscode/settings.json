@@ -1,11 +1,17 @@
 {
   "python.envFile": "${workspaceFolder}/.env",
   "python.analysis.extraPaths": [
-    "${workspaceFolder}/src",
+    "${workspaceFolder}/src/app",
   ],
   "files.exclude": {
     ".venv": true,
     ".ruff_cache": true,
-    ".idea": true
+    ".idea": true,
+    "__pycache__": true,
+    ".pytest_cache": true,
+    "*.lock": true,
+    ".python-version": true,
+    "src/__pycache__": true,
+    "alembic/__pycache__": true,
   }
 }

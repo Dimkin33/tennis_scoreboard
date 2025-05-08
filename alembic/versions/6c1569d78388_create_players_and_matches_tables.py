@@ -1,8 +1,8 @@
 """Create players and matches tables
 
-Revision ID: 749021836713
+Revision ID: 6c1569d78388
 Revises: 
-Create Date: 2025-05-08 14:14:22.821422
+Create Date: 2025-05-08 15:30:15.394841
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '749021836713'
+revision: str = '6c1569d78388'
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
