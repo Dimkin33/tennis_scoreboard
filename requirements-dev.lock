@@ -14,6 +14,8 @@ alembic==1.15.2
     # via tennis-scoreboard
 colorama==0.4.6
     # via pytest
+dotenv==0.9.9
+    # via tennis-scoreboard
 greenlet==3.2.1
     # via sqlalchemy
 iniconfig==2.1.0
@@ -33,12 +35,13 @@ pluggy==1.5.0
     # via pytest
 pytest==8.3.5
     # via tennis-scoreboard
+python-dotenv==1.1.0
+    # via dotenv
 ruff==0.11.8
 sqlalchemy==2.0.40
     # via alembic
-    # via tennis-scoreboard
 typing-extensions==4.13.2
     # via alembic
     # via sqlalchemy
-waitress==3.0.2
+uuid==1.30
     # via tennis-scoreboard

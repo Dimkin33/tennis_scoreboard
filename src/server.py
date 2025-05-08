@@ -1,4 +1,5 @@
 """Запуск HTTP-сервера с поддержкой шаблонов Jinja2 в отдельном потоке."""
+
 import http.server
 import json
 import socketserver
@@ -26,12 +27,12 @@ class CustomHandler(http.server.SimpleHTTPRequestHandler):
         parsed_path = urlparse(self.path)
         path = parsed_path.path
 
-        if path == '/' or path == '':
-            self.path = 'index.html'
+        if path == "/" or path == "":
+            self.path = "index.html"
             super().do_GET()
-        elif path.startswith('/api/'):
+        elif path.startswith("/api/"):
             self.handle_api()
-        elif path == '/favicon.ico':
+        elif path == "/favicon.ico":
             self.send_response(204)
             self.end_headers()
         else:

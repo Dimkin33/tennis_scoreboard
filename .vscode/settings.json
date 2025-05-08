@@ -1,0 +1,11 @@
+{
+  "python.envFile": "${workspaceFolder}/.env",
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}/src",
+  ],
+  "files.exclude": {
+    ".venv": true,
+    ".ruff_cache": true,
+    ".idea": true
+  }
+}

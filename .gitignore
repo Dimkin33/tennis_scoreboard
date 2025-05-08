@@ -10,3 +10,5 @@ build/
 migrations/versions/
 temp_layouts/
 temp_layouts.zip
+.env
+tennis_scoreboard.db
