@@ -1,4 +1,5 @@
 """Сервис для работы с матчами."""
+
 import json
 import uuid
 
@@ -28,7 +29,7 @@ class MatchService:
             player1_id=player1_id,
             player2_id=player2_id,
             winner_id=None,
-            score=json.dumps({"player1": 0, "player2": 0})
+            score=json.dumps({"player1": 0, "player2": 0}),
         )
         self.db.add(match)
         self.db.commit()
@@ -40,7 +41,7 @@ class MatchService:
             player1=PlayerDTO(id=player1.id, name=player1.name),
             player2=PlayerDTO(id=player2.id, name=player2.name),
             winner=None,
-            score=match.score
+            score=match.score,
         )
 
     def update_score(self, match_uuid: str, player_id: int, points: int) -> MatchDTO:
@@ -63,7 +64,11 @@ class MatchService:
 
         player1 = self.db.query(Player).filter(Player.id == match.player1_id).first()
         player2 = self.db.query(Player).filter(Player.id == match.player2_id).first()
-        winner = self.db.query(Player).filter(Player.id == match.winner_id).first() if match.winner_id else None
+        winner = (
+            self.db.query(Player).filter(Player.id == match.winner_id).first()
+            if match.winner_id
+            else None
+        )
 
         return MatchDTO(
             id=match.id,
@@ -71,7 +76,7 @@ class MatchService:
             player1=PlayerDTO(id=player1.id, name=player1.name),
             player2=PlayerDTO(id=player2.id, name=player2.name),
             winner=PlayerDTO(id=winner.id, name=winner.name) if winner else None,
-            score=match.score
+            score=match.score,
         )
 
     def set_winner(self, match_uuid: str, winner_id: int) -> MatchDTO:
@@ -97,7 +102,7 @@ class MatchService:
             player1=PlayerDTO(id=player1.id, name=player1.name),
             player2=PlayerDTO(id=player2.id, name=player2.name),
             winner=PlayerDTO(id=winner.id, name=winner.name) if winner else None,
-            score=match.score
+            score=match.score,
         )
 
     def get_match_by_uuid(self, match_uuid: str) -> MatchDTO | None:
@@ -108,7 +113,11 @@ class MatchService:
 
         player1 = self.db.query(Player).filter(Player.id == match.player1_id).first()
         player2 = self.db.query(Player).filter(Player.id == match.player2_id).first()
-        winner = self.db.query(Player).filter(Player.id == match.winner_id).first() if match.winner_id else None
+        winner = (
+            self.db.query(Player).filter(Player.id == match.winner_id).first()
+            if match.winner_id
+            else None
+        )
 
         return MatchDTO(
             id=match.id,
@@ -116,7 +125,7 @@ class MatchService:
             player1=PlayerDTO(id=player1.id, name=player1.name),
             player2=PlayerDTO(id=player2.id, name=player2.name),
             winner=PlayerDTO(id=winner.id, name=winner.name) if winner else None,
-            score=match.score
+            score=match.score,
         )
 
     def get_all_matches(self) -> list[MatchDTO]:
@@ -124,16 +133,28 @@ class MatchService:
         matches = self.db.query(Match).all()
         result = []
         for match in matches:
-            player1 = self.db.query(Player).filter(Player.id == match.player1_id).first()
-            player2 = self.db.query(Player).filter(Player.id == match.player2_id).first()
-            winner = self.db.query(Player).filter(Player.id == match.winner_id).first() if match.winner_id else None
+            player1 = (
+                self.db.query(Player).filter(Player.id == match.player1_id).first()
+            )
+            player2 = (
+                self.db.query(Player).filter(Player.id == match.player2_id).first()
+            )
+            winner = (
+                self.db.query(Player).filter(Player.id == match.winner_id).first()
+                if match.winner_id
+                else None
+            )
 
-            result.append(MatchDTO(
-                id=match.id,
-                uuid=match.uuid,
-                player1=PlayerDTO(id=player1.id, name=player1.name),
-                player2=PlayerDTO(id=player2.id, name=player2.name),
-                winner=PlayerDTO(id=winner.id, name=winner.name) if winner else None,
-                score=match.score
-            ))
+            result.append(
+                MatchDTO(
+                    id=match.id,
+                    uuid=match.uuid,
+                    player1=PlayerDTO(id=player1.id, name=player1.name),
+                    player2=PlayerDTO(id=player2.id, name=player2.name),
+                    winner=PlayerDTO(id=winner.id, name=winner.name)
+                    if winner
+                    else None,
+                    score=match.score,
+                )
+            )
         return result

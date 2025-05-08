@@ -1,12 +1,13 @@
 """Migrations environment configuration for Alembic."""
+
 import os
 from logging.config import fileConfig
 
 from dotenv import load_dotenv
+from models import Base, Match, Player  # noqa: F401
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from models import Base, Match, Player
 
 # Загружаем переменные из .env
 load_dotenv()
@@ -74,9 +75,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

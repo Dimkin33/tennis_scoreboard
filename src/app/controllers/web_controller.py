@@ -1,1 +1,1 @@
-# Placeholder for Python module
+"""# Placeholder for Python module."""

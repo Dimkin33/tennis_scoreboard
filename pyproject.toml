@@ -31,9 +31,23 @@ line-length = 88
 lint.select = ["E", "F", "W", "I", "N", "D", "B"]
 lint.ignore = ["D203", "D213"]
 target-version = "py313"
-
-[tool.ruff.lint.per-file-ignores]
-"alembic/env.py" = ["F401"]
+exclude = [
+    "build",
+    "dist",
+    ".eggs",
+    ".tox",
+    ".venv",
+    ".env",
+    "__pycache__",
+    "venv",
+    "venvs",
+    ".pytest_cache",
+    "migrations",
+    "tests",
+    "docs",
+    ".ruff_cache",
+    "alembic/versions",
+]
 
 
 [tool.hatch.metadata]

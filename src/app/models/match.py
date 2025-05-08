@@ -1,4 +1,5 @@
 """Модель матча."""
+
 from sqlalchemy import Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
@@ -23,6 +24,8 @@ class Match(Base):
 
     def __repr__(self):
         """Строковое представление матча."""
-        return (f"Match(id={self.id}, uuid='{self.uuid}', "
-                f"player1={self.player1.name}, player2={self.player2.name}, "
-                f"winner={self.winner.name}, score='{self.score}')")
+        return (
+            f"Match(id={self.id}, uuid='{self.uuid}', "
+            f"player1={self.player1.name}, player2={self.player2.name}, "
+            f"winner={self.winner.name}, score='{self.score}')"
+        )

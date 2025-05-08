@@ -1,4 +1,5 @@
 """Сервис для работы с игроками."""
+
 from sqlalchemy.orm import Session
 
 from app.dto import PlayerDTO
