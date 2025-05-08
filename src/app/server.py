@@ -1,62 +1,130 @@
-"""Запуск HTTP-сервера с поддержкой шаблонов Jinja2 в отдельном потоке."""
+"""Create a simple HTTP server to handle requests for the tennis scoreboard app."""
 
-import http.server
 import json
-import socketserver
-import threading
+import logging
+import os
+from http.server import BaseHTTPRequestHandler, HTTPServer
 from urllib.parse import urlparse
 
+from controllers import MatchController
+from dotenv import load_dotenv
 from jinja2 import Environment, FileSystemLoader
 
-PORT = 8000
-TEMPLATE_DIR = "templates"
+# Зависит от PYTHONPATH=src/app
+from models.database import SessionLocal
 
-# Настройка Jinja2
-env = Environment(loader=FileSystemLoader(TEMPLATE_DIR))
+# Загружаем .env
+load_dotenv()
 
+# Получаем настройки из .env
+SERVER_HOST = os.getenv("SERVER_HOST", "localhost")
+SERVER_PORT = int(os.getenv("SERVER_PORT", 8000))
 
-class CustomHandler(http.server.SimpleHTTPRequestHandler):
-    """Обработчик HTTP-запросов с поддержкой API и шаблонов."""
+# Настраиваем Jinja2
+env = Environment(loader=FileSystemLoader("src/app/templates"))
 
-    def __init__(self, *args, **kwargs):
-        """Инициализация обработчика."""
-        super().__init__(*args, directory=TEMPLATE_DIR, **kwargs)
+# Настраиваем логирование
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
+# Добавляем кастомные фильтры
+def from_json(value):
+    """Преобразовать JSON-строку в словарь."""
+    return json.loads(value) if value else {}
+
+def get_score(score_dict):
+    """Получить счёт в формате 'player1:player2'."""
+    return f"{score_dict.get('player1', 0)}:{score_dict.get('player2', 0)}"
+
+env.filters["from_json"] = from_json
+env.filters["get_score"] = get_score
+
+class TennisScoreboardHandler(BaseHTTPRequestHandler):
+    """HTTP handler for the tennis scoreboard app."""
 
     def do_GET(self):  # noqa: N802
-        """Обработка GET-запросов."""
-        parsed_path = urlparse(self.path)
-        path = parsed_path.path
+        """Handle GET requests."""
+        logging.info(f"GET {self.path}")
+        parsed_url = urlparse(self.path)
+        path = parsed_url.path
 
-        if path == "/" or path == "":
-            self.path = "index.html"
-            super().do_GET()
-        elif path.startswith("/api/"):
-            self.handle_api()
-        elif path == "/favicon.ico":
-            self.send_response(204)
+        db = SessionLocal()
+        try:
+            controller = MatchController(db)
+            if path == "/matches":
+                matches = controller.get_all_matches()
+                template = env.get_template("matches.html")
+                self.send_response(200)
+                self.send_header("Content-type", "text/html")
+                self.end_headers()
+                self.wfile.write(template.render(matches=matches).encode())
+                logging.info("Отправлен список матчей")
+            else:
+                self.send_response(404)
+                self.end_headers()
+                logging.warning(f"Страница не найдена: {self.path}")
+        except Exception as e:
+            logging.error(f"Ошибка при обработке GET: {e}")
+            self.send_response(500)
             self.end_headers()
-        else:
-            super().do_GET()
+        finally:
+            db.close()
 
-    def handle_api(self):
-        """Обработка API-запросов."""
-        self.send_response(200)
-        self.send_header("Content-type", "application/json")
-        self.end_headers()
-        response = {"message": "API endpoint not implemented"}
-        self.wfile.write(json.dumps(response).encode())
+    def do_POST(self):  # noqa: N802
+        """Handle POST requests."""
+        logging.info(f"POST {self.path}")
+        parsed_url = urlparse(self.path)
+        path = parsed_url.path
 
+        content_length = int(self.headers["Content-Length"])
+        post_data = self.rfile.read(content_length)
+        data = json.loads(post_data.decode())
+
+        db = SessionLocal()
+        try:
+            controller = MatchController(db)
+            if path == "/new-match":
+                match = controller.create_match(
+                    data["player1_name"],
+                    data["player2_name"]
+                )
+                self.send_response(201)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps(match.to_dict()).encode())
+                logging.info(f"Создан новый матч: {match}")
+
+            elif path == "/match-score":
+                match = controller.update_score(
+                    data["uuid"],
+                    data["player_id"],
+                    data["points"]
+                )
+                self.send_response(200)
+                self.send_header("Content-type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps(match.to_dict()).encode())
+                logging.info(f"Обновлён счёт матча: {match}")
+
+            else:
+                self.send_response(404)
+                self.end_headers()
+                logging.warning(f"Страница не найдена: {self.path}")
+        except Exception as e:
+            logging.error(f"Ошибка при обработке POST: {e}")
+            self.send_response(500)
+            self.end_headers()
+        finally:
+            db.close()
 
 def run_server():
-    """Запуск HTTP-сервера."""
-    with socketserver.TCPServer(("", PORT), CustomHandler) as httpd:
-        print(f"Serving at http://localhost:{PORT}")
-        httpd.serve_forever()
+    """Run the HTTP server."""
+    server_address = (SERVER_HOST, SERVER_PORT)
+    httpd = HTTPServer(server_address, TennisScoreboardHandler)
+    logging.info(f"Starting server on {SERVER_HOST}:{SERVER_PORT}...")
+    httpd.serve_forever()
 
-
-# Запуск сервера в отдельном потоке
-server_thread = threading.Thread(target=run_server, daemon=True)
-server_thread.start()
-
-# Можно выполнять другие задачи здесь
-input("Сервер запущен. Нажмите Enter для завершения...\n")
+if __name__ == "__main__":
+    run_server()

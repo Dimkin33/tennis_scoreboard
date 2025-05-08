@@ -1,12 +1,12 @@
 """Сервис для работы с матчами."""
 
 import json
+import logging
 import uuid
 
+from dto import MatchDTO, PlayerDTO
+from models import Match, Player
 from sqlalchemy.orm import Session
-
-from app.dto import MatchDTO, PlayerDTO
-from app.models import Match, Player
 
 
 class MatchService:
@@ -35,6 +35,8 @@ class MatchService:
         self.db.commit()
         self.db.refresh(match)
 
+        logging.info(f"Создан матч: {match}")
+
         return MatchDTO(
             id=match.id,
             uuid=match.uuid,
@@ -61,6 +63,8 @@ class MatchService:
         match.score = json.dumps(score)
         self.db.commit()
         self.db.refresh(match)
+
+        logging.info(f"Обновлён счёт матча {match_uuid}: {score}")
 
         player1 = self.db.query(Player).filter(Player.id == match.player1_id).first()
         player2 = self.db.query(Player).filter(Player.id == match.player2_id).first()
@@ -91,6 +95,8 @@ class MatchService:
         match.winner_id = winner_id
         self.db.commit()
         self.db.refresh(match)
+
+        logging.info(f"Установлен победитель {winner_id} для матча {match_uuid}")
 
         player1 = self.db.query(Player).filter(Player.id == match.player1_id).first()
         player2 = self.db.query(Player).filter(Player.id == match.player2_id).first()
@@ -157,4 +163,7 @@ class MatchService:
                     score=match.score,
                 )
             )
+
+        logging.info(f"Получено {len(result)} матчей")
+
         return result

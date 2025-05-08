@@ -15,7 +15,7 @@ class Match(Base):
     uuid = Column(String, unique=True, nullable=False)
     player1_id = Column(Integer, ForeignKey("players.id"), nullable=False)
     player2_id = Column(Integer, ForeignKey("players.id"), nullable=False)
-    winner_id = Column(Integer, ForeignKey("players.id"), nullable=False)
+    winner_id = Column(Integer, ForeignKey("players.id"), nullable=True)
     score = Column(String, nullable=False)  # JSON string
 
     player1 = relationship("Player", foreign_keys=[player1_id])

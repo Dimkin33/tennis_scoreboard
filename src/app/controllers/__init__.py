@@ -1,1 +1,4 @@
-"""kj."""
+"""Экспорт контроллеров."""
+from .match_controller import MatchController
+
+__all__ = ["MatchController"]

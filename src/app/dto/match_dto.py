@@ -24,7 +24,7 @@ class MatchDTO:
             "uuid": self.uuid,
             "player1": self.player1.to_dict(),
             "player2": self.player2.to_dict(),
-            "winner": self.winner.to_dict(),
+            "winner": self.winner.to_dict() if self.winner else None,
             "score": self.score,
         }
 
