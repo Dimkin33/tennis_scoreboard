@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from sqlalchemy import engine_from_config, pool
 
 from alembic import context
-from models.database import Base
+from models import Base, Match, Player
 
 # Загружаем переменные из .env
 load_dotenv()
