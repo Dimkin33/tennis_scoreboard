@@ -57,6 +57,10 @@
 git clone https://github.com/Dimkin33/tennis_scoreboard.git
 cd tennis_scoreboard
 
+# Создайте локальный файл окружения из безопасного шаблона
+cp .env.example .env
+# Затем задайте собственные значения, особенно POSTGRES_PASSWORD
+
 # Запуск всего стека
 docker-compose up -d
 
